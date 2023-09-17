@@ -726,8 +726,8 @@ def on_activate(app):
 
     #--- add css for tint effects ---
     css_provider = Gtk.CssProvider()
-    css_str = b".red{filter: sepia(100%) hue-rotate(0deg) saturate(10000%) brightness(75%);}"
-    css_provider.load_from_data(css_str)
+    css_str = ".red{filter: sepia(100%) hue-rotate(0deg) saturate(10000%) brightness(75%);}"
+    css_provider.load_from_data(css_str, -1)
     Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider, 800)
 
     window.present()

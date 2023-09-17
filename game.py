@@ -132,7 +132,7 @@ def fx_add(spark, x, y):
           a_fx["frame"] = 0
           a_fx["spark"] = spark
           a_fx["used"] = True
-          a_fx["picture"].show()
+          a_fx["picture"].props.visible = True
           return
 
 def fx_update():
@@ -145,7 +145,7 @@ def fx_update():
             if ((not a_fx["spark"] and a_fx["frame"] == EXPLOSION_FRAMES * 2) or
                 (a_fx["spark"] and a_fx["frame"] == SPARKS_FRAMES * 2)):
                 a_fx["used"] = False
-                a_fx["picture"].hide()
+                a_fx["picture"].props.visible = False
 
 
 def fx_draw():
@@ -209,7 +209,7 @@ def shots_add(ship, straight, x, y):
 
             shot["frame"] = 0
             shot["used"] = True
-            shot["picture"].show()
+            shot["picture"].props.visible = True
             return True
     
     return False
@@ -229,7 +229,7 @@ def shots_update():
 
             if shot["y"] < -SHIP_SHOT_H:
                 shot["used"] = False
-                picture.hide()
+                picture.props.visible = False
                 continue
         else: # alien
             shot["x"] = shot["x"] + shot["dx"]
@@ -241,7 +241,7 @@ def shots_update():
               shot["y"] > DISP_H):
             
                 shot["used"] = False
-                picture.hide()
+                picture.props.visible = False
                 continue
 
         shot["frame"] = shot["frame"] + 1
@@ -270,7 +270,7 @@ def shots_collide(ship, x, y, w, h):
         if collide(x, y, x+w, y+h, shot["x"], shot["y"], shot["x"]+sw, shot["y"]+sh):
             fx_add(True, shot["x"] + math.floor(sw / 2), shot["y"] + math.floor(sh / 2))
             shot["used"] = False
-            shot["picture"].hide()
+            shot["picture"].props.visible = False
             return True
 
     return False
@@ -375,19 +375,19 @@ def ship_draw():
     global ship, game_layer
 
     if ship["lives"] < 0:
-        ship["picture"].hide()
+        ship["picture"].props.visible = False
         return
 
     if ship["respawn_timer"] > 0:
-        ship["picture"].hide()
+        ship["picture"].props.visible = False
         return
    
     if (math.floor(ship["invincible_timer"] / 2) % 3) == 1:
-        ship["picture"].hide()
+        ship["picture"].props.visible = False
         return
     
     game_layer.move(ship["picture"], ship["x"], ship["y"])
-    ship["picture"].show()
+    ship["picture"].props.visible = True
 
 
 #--- aliens ---
@@ -431,7 +431,7 @@ def aliens_update():
                 alien["shot_timer"] = random.randint(1, 99)
                 alien["blink"] = 0
                 alien["used"] = True
-                alien["picture"].show()
+                alien["picture"].props.visible = True
 
                 if alien["type"] == ALIEN_TYPE_BUG:
                     alien["life"] = 4
@@ -457,7 +457,7 @@ def aliens_update():
 
         if alien["y"] >= DISP_H:
             alien["used"] = False
-            alien["picture"].hide()
+            alien["picture"].props.visible = False
             continue
 
         if alien["blink"] > 0:
@@ -485,7 +485,7 @@ def aliens_update():
                 fx_add(False, cx+16, cy+16)
 
             alien["used"] = False
-            alien["picture"].hide()
+            alien["picture"].props.visible = False
             continue
 
         alien["shot_timer"] = alien["shot_timer"] - 1
@@ -511,11 +511,11 @@ def aliens_draw():
         picture = alien["picture"]
         
         if not alien["used"]:
-            picture.hide()
+            picture.props.visible = False
             continue
 
         if alien["blink"] > 2:
-            picture.hide()
+            picture.props.visible = False
             continue
 
         
@@ -529,7 +529,7 @@ def aliens_draw():
         picture.set_paintable(sprites["alien"][alien["type"]])
         picture.set_size_request(ALIEN_W[alien["type"]], ALIEN_H[alien["type"]])
         game_layer.move(picture, alien["x"], alien["y"])
-        alien["picture"].show()
+        alien["picture"].props.visible = True
 
 
 #--- HUD ---
@@ -577,10 +577,10 @@ def hud_draw():
     if start_i < 0:
         start_i = 0
     for i in range(start_i, 3):
-        lives_pictures[i].hide()
+        lives_pictures[i].props.visible = False
 
     if ship["lives"] < 0:
-        gameover_label.show()
+        gameover_label.props.visible = True
 
 
 #--- stars ---
@@ -701,7 +701,7 @@ def on_activate(app):
     gameover_label = Gtk.Label(label='<span foreground="white">G A M E  O V E R</span>',
                                use_markup=True)
     vbox.append(gameover_label)
-    gameover_label.hide()
+    gameover_label.props.visible = False
     
     window.set_child(overlay)
 
@@ -726,8 +726,8 @@ def on_activate(app):
 
     #--- add css for tint effects ---
     css_provider = Gtk.CssProvider()
-    css_str = b".red{filter: sepia(100%) hue-rotate(0deg) saturate(10000%) brightness(75%);}"
-    css_provider.load_from_data(css_str)
+    css_str = ".red{filter: sepia(100%) hue-rotate(0deg) saturate(10000%) brightness(75%);}"
+    css_provider.load_from_data(css_str, -1)
     Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider, 800)
 
     window.present()
